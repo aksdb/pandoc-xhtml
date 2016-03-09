@@ -24,12 +24,9 @@
     local gsub = string.gsub
 
     function xml.functions.collectauthors(root)
-        print("collect authors called.")
         for e in xml.collected(root, "/h2[contains(@class,'author')]") do
             table.insert(usercode.authors, xml.text(e))
-            print("Inserting: "..xml.text(e))
         end
-        print("Test: "..utilities.parsers.array_to_string(usercode.authors, ", "))
     end
 
     function xml.expressions.idstring(str)
@@ -305,7 +302,13 @@
 \stopxmlsetups
 
 \startxmlsetups xml:body
+    % Inside <body>-tags we want to process all elements we know.
     \xmlflush{#1}
+
+    % Afterwards (i.e when the tag closes), we should cleanup dangling
+    % section blocks. If a section block is not closed, the last page
+    % might not be set correctly.
+    \cleanupsectionblocks
 \stopxmlsetups
 
 \startxmlsetups xml:doc:title
@@ -842,6 +845,8 @@ end
 
 %%%%%%%%%% Additions
 
+\def\applyTABLEstyle{}
+
 \startxmlsetups xml:table:table
     \xmldoif{#1}{/caption/float}{%
         \placetable%
@@ -851,6 +856,7 @@ end
             \bgroup}
     
     \bTABLE
+    \applyTABLEstyle
     \xmlflush{#1}
     \eTABLE
 
@@ -1066,6 +1072,16 @@ end
     \let\la\space
     \let\deo\space
 \to \simplifiedcommands
+
+%%% Cleanup dangling section blocks
+\starttexdefinition cleanupsectionblocks
+  \doifmode{*whatcomesfirst}{\stopfirstmatter}
+  \doifmode{*frontpart}{\stopfrontmatter}
+  \doifmode{*bodypart}{\stopbodymatter}
+  \doifmode{*backpart}{\stopbackmatter}
+\stoptexdefinition
+
+%\appendtoks\cleanupsectionblocks\to\everylastshipout
 
 %%% the current setup. They need to be configured (setup)
 %%% when if we want to use them (otherwise we get only defaults).
