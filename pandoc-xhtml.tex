@@ -292,6 +292,10 @@
         {span[contains(@class,'symbol')]}
         {xml:tex:symbol}
 
+    \xmlsetsetup{\xmldocument}
+        {span[contains(@class,'margin')]}
+        {xml:margin}
+
 \stopxmlsetups
 
 \xmlregistersetup{xml:pandoc}
@@ -827,6 +831,10 @@ end
      \low{\xmlflush{#1}}
 \stopxmlsetups
 
+\startxmlsetups xml:margin
+     \margintext{\xmlflush{#1}}
+\stopxmlsetups
+
 %%% this element is the way to get the TeX and ConTeXt logos
 %%% markdown tagging:
 %%% <span label="tex">TeX</span>
@@ -855,7 +863,7 @@ end
             {\xmltext{#1}{/caption}}%
             \bgroup}
     
-    \bTABLE
+    \bTABLE[split=repeat,align=normal]
     \applyTABLEstyle
     \xmlflush{#1}
     \eTABLE
@@ -914,9 +922,9 @@ end
 \stopxmlsetups
 
 \startxmlsetups xml:img:float
-    \placefigure[][\xmlattribute{#1}{/img}{id}]{\xmltext{#1}{/p[@class='caption']}}{
+    \startplacefigure[reference=\xmlattribute{#1}{/img}{id}, title=\xmltext{#1}{/p[@class='caption']}]
         \xmlflush{#1}
-    }
+    \stopplacefigure
 \stopxmlsetups
 
 \startxmlsetups xml:math:inline
